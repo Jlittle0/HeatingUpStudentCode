@@ -51,20 +51,23 @@ public class WeatherPatterns {
         // Offset everything from -50 to 130 to start at 0
         // Map that stores the greatest current run that ends with a temperature correlated to
         // the index of the map with an offset of 50 to fit all temps from -50° to 130°.
+
+
+        // Only check temperatures that are greater than the current starting point.
         int longestRun = 0;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size - longestRun; i++) {
             int[] map = new int[181];
-            // Iterate through the rest of the temperatures from the starting location i
+            // Iterate through the rest of the temperatures from the starting location i but
+            // only check for values larger than the starting point
             for (int j = i; j < size; j++) {
 //                System.out.println("Current Number: " + j + " temp: " + temps[j]);
-                map[temps[j] + 50] = findCurrentRun(j, temps, map);
+                if (temps[j] >= temps[i]) {
+                    map[temps[j] + 50] = findCurrentRun(j, temps, map, longestRun);
+                    longestRun = map[temps[j] + 50] > longestRun ? map[temps[j] + 50] : longestRun;
+                }
 //                System.out.println("--------------------------------------------------------------------------------");
             }
-            // Iterate through the entirety of the current length map to check if any of the new
-            // longest values is greater than the current longestRun. If so, replace.
-            for (int num : map)
-                longestRun = num > longestRun ? num : longestRun;
 //            System.out.println("best run: " + longestRun);
         }
 
@@ -73,7 +76,7 @@ public class WeatherPatterns {
         return longestRun;
     }
 
-    public static int findCurrentRun(int end, int[] temps, int[] map) {
+    public static int findCurrentRun(int end, int[] temps, int[] map, int longestRun) {
 //        System.out.print("Temperatures: ");
         for (int i = 0; i < end; i++) {
 //            System.out.print(temps[i] + " | ");
@@ -82,7 +85,7 @@ public class WeatherPatterns {
         int currentRun = 0;
         int currentTemp = temps[end] + 50;
 //        System.out.println("Current Temp: " + currentTemp);
-        for (int i = 0; i < currentTemp; i++) {
+        for (int i = longestRun; i < currentTemp; i++) {
             if (map[i] > currentRun)
                 currentRun = map[i];
         }
